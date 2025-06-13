@@ -9,6 +9,8 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/trix@2.0.0/dist/trix.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -577,93 +579,133 @@
     <main style="padding-top: 100px;">
         @yield('content')
     </main>
-  <footer style="background-color: var(--brand-dark); color: var(--brand-light); padding: 3rem 0;">
-    <style>
-        :root {
-            --brand-primary: #2d3c43;
-            --brand-dark: #0c3b3b;
-            --brand-beige: #d5c6b1;
-            --brand-gray: #2a2a2a;
-            --brand-light: #f5f4ef;
-        }
+    <footer style="background-color: var(--brand-dark); color: var(--brand-light); padding: 3rem 0;">
+        <style>
+            :root {
+                --brand-primary: #2d3c43;
+                --brand-dark: #0c3b3b;
+                --brand-beige: #d5c6b1;
+                --brand-gray: #2a2a2a;
+                --brand-light: #f5f4ef;
+            }
 
-        .footer-menu a,
-        .social-links a {
-            display: inline-block;
-            color: var(--brand-light);
-            margin: 0 0.5rem;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
+            .footer-menu a,
+            .social-links a {
+                display: inline-block;
+                color: var(--brand-light);
+                margin: 0 0.5rem;
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
 
-        .footer-menu a:hover,
-        .social-links a:hover {
-            color: var(--brand-beige);
-        }
+            .footer-menu a:hover,
+            .social-links a:hover {
+                color: var(--brand-beige);
+            }
 
-        .footer-bottom {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 0.9rem;
-        }
+            .footer-bottom {
+                margin-top: 2rem;
+                padding-top: 1rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+                font-size: 0.9rem;
+            }
 
-        .footer-bottom a {
-            color: rgba(255, 255, 255, 0.6);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
+            .footer-bottom a {
+                color: rgba(255, 255, 255, 0.6);
+                text-decoration: none;
+                transition: color 0.3s ease;
+            }
 
-        .footer-bottom a:hover {
-            color: var(--brand-beige);
-        }
+            .footer-bottom a:hover {
+                color: var(--brand-beige);
+            }
 
-        .social-links a i {
-            font-size: 1.5rem;
-            margin: 0 0.4rem;
-        }
-    </style>
+            .social-links a i {
+                font-size: 1.5rem;
+                margin: 0 0.4rem;
+            }
+        </style>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-4 mb-4 mb-lg-0">
-                <img src="{{ asset('images/logo.png') }}" alt="Alberto Ascencion" height="160">
-                <p class="mt-3">Transformando espacios de cocina en hogares con personalidad.</p>
-            </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <img src="{{ asset('images/logo.png') }}" alt="Alberto Ascencion" height="160">
+                    <p class="mt-3">Transformando espacios de cocina en hogares con personalidad.</p>
+                </div>
 
-            <div class="col-lg-4 mb-4 mb-lg-0 text-lg-center">
-                <h5 class="text-uppercase text-white">Enlaces rápidos</h5>
-                <div class="footer-menu mt-3">
-                    <a href="#inicio">Inicio</a>
-                    <a href="#servicios">Servicios</a>
-                    <a href="#portafolio">Portafolio</a>
-                    <a href="#testimonios">Testimonios</a>
-                    <a href="#contacto">Contacto</a>
+                <div class="col-lg-4 mb-4 mb-lg-0 text-lg-center">
+                    <h5 class="text-uppercase text-white">Enlaces rápidos</h5>
+                    <div class="footer-menu mt-3">
+                        <a href="#inicio">Inicio</a>
+                        <a href="#servicios">Servicios</a>
+                        <a href="#portafolio">Portafolio</a>
+                        <a href="#testimonios">Testimonios</a>
+                        <a href="#contacto">Contacto</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 text-lg-end">
+                    <h5 class="text-uppercase text-white">Síguenos</h5>
+                    <div class="social-links mt-3">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                        <a href="#"><i class="fab fa-houzz"></i></a>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-lg-4 text-lg-end">
-                <h5 class="text-uppercase text-white">Síguenos</h5>
-                <div class="social-links mt-3">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-pinterest"></i></a>
-                    <a href="#"><i class="fab fa-houzz"></i></a>
+            <div class="footer-bottom text-center">
+                <p class="mb-1">© 2025 Alberto Ascencion LLC. Todos los derechos reservados.</p>
+                <div>
+                    <a href="#">Política de privacidad</a> |
+                    <a href="#">Términos y condiciones</a>
                 </div>
             </div>
         </div>
-
-        <div class="footer-bottom text-center">
-            <p class="mb-1">© 2025 Alberto Ascencion LLC. Todos los derechos reservados.</p>
-            <div>
-                <a href="#">Política de privacidad</a> |
-                <a href="#">Términos y condiciones</a>
-            </div>
-        </div>
-    </div>
-</footer>
+    </footer>
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/trix@2.0.0/dist/trix.umd.min.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
+    </script>
+
+    <script>
+        document.addEventListener("trix-attachment-add", function(event) {
+            if (event.attachment.file) {
+                uploadFileAttachment(event.attachment);
+            }
+        });
+
+        function uploadFileAttachment(attachment) {
+            const file = attachment.file;
+            const form = new FormData();
+            form.append("file", file);
+
+            fetch("{{ route('blog.upload') }}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: form
+                })
+                .then(response => response.json())
+                .then(data => {
+                    attachment.setAttributes({
+                        url: data.url,
+                        href: data.url
+                    });
+                })
+                .catch(error => {
+                    console.error("Upload failed:", error);
+                });
+        }
+    </script>
 </body>
 
 </html>

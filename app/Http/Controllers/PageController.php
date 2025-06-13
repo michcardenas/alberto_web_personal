@@ -123,11 +123,6 @@ public function hostella()
     return view('paginas.hostella');
 }
 
-public function blog()
-{
-    return view('paginas.blog');
-}
-
 public function prensaEventos()
 {
     return view('paginas.prensa-eventos');

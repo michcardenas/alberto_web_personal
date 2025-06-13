@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use App\Models\GlobalSetting;
 use App\Models\Pagina;
 use App\Models\Seccion;
 use App\Models\Contenido;
-
+use Illuminate\Support\Str;
 
 
 class PaginaController extends Controller
@@ -245,9 +246,16 @@ class PaginaController extends Controller
 
     public function secciones(Pagina $pagina)
     {
-        $secciones = $pagina->secciones;
+        // Si es la página del blog, redirige al index del módulo blog
+        if ($pagina->slug === 'blog') {
+            return redirect()->route('admin.blog.index');
+        }
+
+        // De lo contrario, carga las secciones normales
+        $secciones = $pagina->secciones()->with('contenidos')->get();
         return view('admin.paginas.secciones', compact('pagina', 'secciones'));
     }
+
 
     public function editSeccion(Pagina $pagina, Seccion $seccion)
     {
@@ -257,8 +265,29 @@ class PaginaController extends Controller
 
     public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion)
     {
-        foreach ($request->except('_token') as $clave => $valor) {
-            $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $valor]);
+        foreach ($request->all() as $clave => $valor) {
+            if ($clave === '_token') continue;
+
+            // Si se subió una nueva imagen
+            if ($request->hasFile($clave)) {
+                $archivo = $request->file($clave);
+                $nombreArchivo = uniqid() . '.' . $archivo->getClientOriginalExtension();
+                $ruta = 'uploads/' . $nombreArchivo;
+                $archivo->move(public_path('uploads'), $nombreArchivo);
+
+                // Buscar contenido anterior
+                $contenidoAnterior = $seccion->contenidos()->where('clave', $clave)->first();
+                if ($contenidoAnterior && File::exists(public_path($contenidoAnterior->valor))) {
+                    File::delete(public_path($contenidoAnterior->valor)); // borrar imagen anterior
+                }
+
+                $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $ruta]);
+            }
+
+            // Si es texto normal y no imagen
+            elseif (!Str::startsWith($clave, 'img_')) {
+                $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $valor]);
+            }
         }
 
         return redirect()->route('paginas.secciones', $pagina)->with('success', 'Sección actualizada correctamente.');
