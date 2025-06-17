@@ -588,80 +588,68 @@
         @yield('content')
     </main>
 
-    <footer style="background-color: var(--brand-dark); color: var(--brand-light); padding: 3rem 0;">
-        <style>
-            :root {
-                --brand-primary: #2d3c43;
-                --brand-dark: #0c3b3b;
-                --brand-beige: #d5c6b1;
-                --brand-gray: #2a2a2a;
-                --brand-light: #f5f4ef;
-            }
+<footer style="background-color: var(--brand-dark); color: var(--brand-light); padding: 3rem 0;">
+    <style>
+        :root {
+            --brand-primary: #2d3c43;
+            --brand-dark: #0c3b3b;
+            --brand-beige: #d5c6b1;
+            --brand-gray: #2a2a2a;
+            --brand-light: #f5f4ef;
+        }
 
-            .footer-menu a,
-            .social-links a {
-                display: inline-block;
-                color: var(--brand-light);
-                margin: 0 0.5rem;
-                text-decoration: none;
-                transition: color 0.3s ease;
-            }
+        .footer-bottom {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+        }
 
-            .footer-menu a:hover,
-            .social-links a:hover {
-                color: var(--brand-beige);
-            }
+        .footer-bottom a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
 
-            .footer-bottom {
-                margin-top: 2rem;
-                padding-top: 1rem;
-                border-top: 1px solid rgba(255, 255, 255, 0.2);
-                font-size: 0.9rem;
-            }
+        .footer-bottom a:hover {
+            color: var(--brand-beige);
+        }
 
-            .footer-bottom a {
-                color: rgba(255, 255, 255, 0.6);
-                text-decoration: none;
-                transition: color 0.3s ease;
-            }
+        .footer-logo {
+            text-align: center;
+        }
 
-            .footer-bottom a:hover {
-                color: var(--brand-beige);
-            }
+        .footer-logo img {
+            height: 140px;
+        }
 
-            .social-links a i {
-                font-size: 1.5rem;
-                margin: 0 0.4rem;
-            }
-        </style>
+        .footer-description {
+            max-width: 600px;
+            margin: 1.5rem auto 0 auto;
+            text-align: center;
+            font-size: 1rem;
+        }
+    </style>
 
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4 mb-lg-0">
-                    <img src="{{ asset('images/logo.png') }}" alt="Alberto Ascencion" height="160">
-                    <p class="mt-3">Transformando espacios de cocina en hogares con personalidad.</p>
-                </div>
+    <div class="container">
+        <div class="footer-logo">
+            <img src="{{ asset('images/logo.png') }}" alt="Alberto Ascencion">
+            <p class="footer-description">
+                Profesional con más de 10 años de experiencia liderando proyectos estratégicos en compras y transformación digital para el sector público y privado.
+            </p>
+        </div>
 
-                <div class="col-lg-4 text-lg-end">
-                    <h5 class="text-uppercase text-white">Síguenos</h5>
-                    <div class="social-links mt-3">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-pinterest"></i></a>
-                        <a href="#"><i class="fab fa-houzz"></i></a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="footer-bottom text-center">
-                <p class="mb-1">© 2025 Alberto Ascencion LLC. Todos los derechos reservados.</p>
-                <div>
-                    <a href="#">Política de privacidad</a> |
-                    <a href="#">Términos y condiciones</a>
-                </div>
+        <div class="footer-bottom text-center">
+            <p class="mb-1">© 2025 Alberto Ascencion. Todos los derechos reservados.</p>
+            <div>
+                <a href="#">Política de privacidad</a> |
+                <a href="#">Términos y condiciones</a>
             </div>
         </div>
-    </footer>
+    </div>
+</footer>
+
+
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>

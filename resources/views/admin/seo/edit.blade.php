@@ -45,10 +45,6 @@
             <input type="text" name="canonical" class="form-control" value="{{ old('canonical', $seo->canonical) }}">
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Slug (opcional)</label>
-            <input type="text" name="slug" class="form-control" value="{{ old('slug', $seo->slug) }}">
-        </div>
 
         <button type="submit" class="btn btn-primary">Guardar cambios</button>
         <a href="{{ route('admin.seo.index') }}" class="btn btn-secondary">Volver</a>

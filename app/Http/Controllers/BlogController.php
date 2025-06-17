@@ -55,32 +55,38 @@ class BlogController extends Controller
     {
         return view('admin.blog.create');
     }
+public function store(Request $request)
+{
+    $data = $request->validate([
+        'titulo' => 'required|string|max:255',
+        'slug' => 'nullable|string|unique:articulos,slug',
+        'contenido' => 'required|string',
+        'imagen' => 'nullable|image|max:2048',
+    ]);
 
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'titulo' => 'required|string|max:255',
-            'slug' => 'nullable|string|unique:articulos,slug',
-            'contenido' => 'required|string',
-            'imagen' => 'nullable|image|max:2048',
-        ]);
+    // 🧠 Slug automático si no se especifica
+    $data['slug'] = $data['slug'] ?? Str::slug($data['titulo']);
 
-        // Slug automático si no se especifica
-        $data['slug'] = $data['slug'] ?? Str::slug($data['titulo']);
+    // 🔥 Limpia enlaces tipo <a> con nombres de imágenes
+    $data['contenido'] = preg_replace('/<a[^>]*>[^<]+\.(jpg|jpeg|png|gif)<\/a>/i', '', $data['contenido']);
 
-        // 🔥 Limpia enlaces tipo <a> con nombres de imágenes
-        $data['contenido'] = preg_replace('/<a[^>]*>[^<]+\.(jpg|jpeg|png|gif)<\/a>/i', '', $data['contenido']);
+    if ($request->hasFile('imagen')) {
+        $nombreArchivo = uniqid() . '.' . $request->file('imagen')->getClientOriginalExtension();
+        $carpetaDestino = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/public_html/images';
 
-        if ($request->hasFile('imagen')) {
-            $nombreArchivo = uniqid() . '.' . $request->file('imagen')->getClientOriginalExtension();
-            $request->file('imagen')->move(public_path('uploads/articulos'), $nombreArchivo);
-            $data['imagen'] = 'uploads/articulos/' . $nombreArchivo;
+        if (!File::exists($carpetaDestino)) {
+            File::makeDirectory($carpetaDestino, 0755, true);
         }
 
-        Articulo::create($data);
-
-        return redirect()->route('admin.blog.index')->with('success', 'Artículo creado correctamente.');
+        $request->file('imagen')->move($carpetaDestino, $nombreArchivo);
+        $data['imagen'] = 'images/' . $nombreArchivo;
     }
+
+    Articulo::create($data);
+
+    return redirect()->route('admin.blog.index')->with('success', 'Artículo creado correctamente.');
+}
+
 
 
 
@@ -100,19 +106,28 @@ class BlogController extends Controller
         ]);
 
         $data['slug'] = $data['slug'] ?? Str::slug($data['titulo']);
+
+        // 🧼 Limpia <a> con nombres de imágenes
         $data['contenido'] = preg_replace('/<a[^>]*>[^<]+\.(jpg|jpeg|png|gif)<\/a>/i', '', $data['contenido']);
 
         if ($request->hasFile('imagen')) {
+            // 🗑️ Eliminar anterior
             if ($articulo->imagen) {
-                $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/' . $articulo->imagen;
+                $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/public_html/' . $articulo->imagen;
                 if (File::exists($rutaCompleta)) {
                     File::delete($rutaCompleta);
                 }
             }
 
             $nombreArchivo = uniqid() . '.' . $request->file('imagen')->getClientOriginalExtension();
-            $request->file('imagen')->move('/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/uploads/articulos', $nombreArchivo);
-            $data['imagen'] = 'uploads/articulos/' . $nombreArchivo;
+            $carpetaDestino = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/public_html/images';
+
+            if (!File::exists($carpetaDestino)) {
+                File::makeDirectory($carpetaDestino, 0755, true);
+            }
+
+            $request->file('imagen')->move($carpetaDestino, $nombreArchivo);
+            $data['imagen'] = 'images/' . $nombreArchivo;
         }
 
         $articulo->update($data);
@@ -121,20 +136,28 @@ class BlogController extends Controller
     }
 
 
+
     public function upload(Request $request)
     {
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $nombreArchivo = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move('/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/uploads/articulos', $nombreArchivo);
+            $carpetaDestino = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/public_html/images';
+
+            if (!File::exists($carpetaDestino)) {
+                File::makeDirectory($carpetaDestino, 0755, true);
+            }
+
+            $file->move($carpetaDestino, $nombreArchivo);
 
             return response()->json([
-                'url' => asset('uploads/articulos/' . $nombreArchivo),
+                'url' => asset('images/' . $nombreArchivo),
             ]);
         }
 
         return response()->json(['error' => 'No se subió ningún archivo'], 400);
     }
+
 
 
 
