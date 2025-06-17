@@ -142,7 +142,6 @@ public function prensaEventos()
     return view('paginas.prensa-eventos', compact('pagina', 'seo', 'contenidos'));
 }
 
-
 public function contacto()
 {
     $pagina = Pagina::where('slug', 'contacto')->firstOrFail();

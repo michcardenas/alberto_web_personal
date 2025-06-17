@@ -90,22 +90,25 @@
 </head>
 <body>
     <header>
-        <div class="container" data-aos="fade-up">
-            <h1>Alberto Ascención</h1>
-            <p>
-                Profesional con más de 10 años de experiencia en compras nacionales e internacionales. Especialista en transformación digital, estrategia de proveedores y eficiencia operativa, con enfoque en innovación y liderazgo.
-            </p>
+<div class="container" data-aos="fade-up">
+    <img src="{{ asset('img/logo.png') }}" alt="Logo de Alberto Ascención" style="width: 120px; margin-bottom: 1rem;">
+    
+    <h1>Alberto Ascención</h1>
+    <p>
+        Profesional con más de 10 años de experiencia en compras nacionales e internacionales. Especialista en transformación digital, estrategia de proveedores y eficiencia operativa, con enfoque en innovación y liderazgo.
+    </p>
 
-            <div class="buttons" data-aos="fade-up" data-aos-delay="200">
-                <a href="{{ route('home') }}" class="btn-link">Inicio</a>
-                <a href="{{ route('sobre-mi') }}" class="btn-link">Sobre mí</a>
-                <a href="{{ route('lo-que-hago') }}" class="btn-link">Lo que hago</a>
-                <a href="{{ route('hostella') }}" class="btn-link">Hostella</a>
-                <a href="{{ route('blog') }}" class="btn-link">Blog</a>
-                <a href="{{ route('prensa-eventos') }}" class="btn-link">Prensa y eventos</a>
-                <a href="{{ route('contacto') }}" class="btn-link">Contáctanos</a>
-            </div>
-        </div>
+    <div class="buttons" data-aos="fade-up" data-aos-delay="200">
+        <a href="{{ route('home') }}" class="btn-link">Inicio</a>
+        <a href="{{ route('sobre-mi') }}" class="btn-link">Sobre mí</a>
+        <a href="{{ route('lo-que-hago') }}" class="btn-link">Lo que hago</a>
+        <a href="{{ route('hostella') }}" class="btn-link">Hostella</a>
+        <a href="{{ route('blog') }}" class="btn-link">Blog</a>
+        <a href="{{ route('prensa-eventos') }}" class="btn-link">Prensa y eventos</a>
+        <a href="{{ route('contacto') }}" class="btn-link">Contáctanos</a>
+    </div>
+</div>
+
     </header>
 
     <script>
