@@ -11,6 +11,7 @@ use App\Models\Pagina;
 use App\Models\Seccion;
 use App\Models\Contenido;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 
 class PaginaController extends Controller
@@ -263,20 +264,33 @@ class PaginaController extends Controller
         return view('admin.paginas.edit-seccion', compact('pagina', 'seccion', 'contenidos'));
     }
 
-  public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion)
+public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion)
 {
-    // 💥 Eliminar campos
+    Log::info('🛠️ Iniciando updateSeccion', [
+        'pagina_id' => $pagina->id,
+        'seccion_id' => $seccion->id,
+        'request_keys' => array_keys($request->all()),
+    ]);
+
     if ($request->has('eliminar_campos')) {
         foreach ($request->input('eliminar_campos') as $clave) {
             $contenido = $seccion->contenidos()->where('clave', $clave)->first();
 
             if ($contenido) {
+                Log::info("🗑️ Eliminando contenido: $clave");
+
                 if (Str::startsWith($clave, 'img_')) {
                     $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/' . $contenido->valor;
+                    Log::info("📂 Ruta física a borrar: $rutaCompleta");
+
                     if (File::exists($rutaCompleta)) {
                         File::delete($rutaCompleta);
+                        Log::info("✅ Archivo eliminado: $rutaCompleta");
+                    } else {
+                        Log::warning("⚠️ Archivo no encontrado para eliminar: $rutaCompleta");
                     }
                 }
+
                 $contenido->delete();
             }
         }
@@ -289,21 +303,37 @@ class PaginaController extends Controller
             $archivo = $request->file($clave);
             $nombreArchivo = uniqid() . '.' . $archivo->getClientOriginalExtension();
             $ruta = 'uploads/' . $nombreArchivo;
+            $destino = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/uploads';
 
-            $archivo->move('/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/uploads', $nombreArchivo);
+            Log::info("📤 Subiendo archivo para clave: $clave", [
+                'nombre_archivo' => $nombreArchivo,
+                'destino' => $destino,
+            ]);
+
+            try {
+                $archivo->move($destino, $nombreArchivo);
+                Log::info("✅ Imagen movida correctamente");
+            } catch (\Exception $e) {
+                Log::error("❌ Error al mover archivo: " . $e->getMessage());
+            }
 
             $contenidoAnterior = $seccion->contenidos()->where('clave', $clave)->first();
             if ($contenidoAnterior) {
-                $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/' . $contenidoAnterior->valor;
+                $rutaCompleta = $destino . '/' . basename($contenidoAnterior->valor);
                 if (File::exists($rutaCompleta)) {
                     File::delete($rutaCompleta);
+                    Log::info("🧹 Imagen anterior eliminada: $rutaCompleta");
+                } else {
+                    Log::warning("⚠️ Imagen anterior no encontrada: $rutaCompleta");
                 }
             }
 
             $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $ruta]);
+            Log::info("📌 Contenido actualizado/creado con imagen: $clave → $ruta");
         }
         elseif (!Str::startsWith($clave, 'img_')) {
             $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $valor]);
+            Log::info("📄 Contenido texto actualizado/creado: $clave");
         }
     }
 
@@ -314,12 +344,15 @@ class PaginaController extends Controller
 
             if ($clave && $valor !== null) {
                 $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $valor]);
+                Log::info("🆕 Nuevo contenido agregado: $clave");
             }
         }
     }
 
+    Log::info('✅ Sección actualizada correctamente');
     return redirect()->route('paginas.secciones', $pagina)->with('success', 'Sección actualizada correctamente.');
 }
+
 
 
 }
