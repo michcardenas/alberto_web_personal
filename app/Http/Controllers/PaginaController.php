@@ -301,8 +301,8 @@ public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion
             $archivo = $request->file($clave);
             $nombreArchivo = uniqid() . '.' . $archivo->getClientOriginalExtension();
 
-            $destino = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/secciones';
-            $ruta = 'secciones/' . $nombreArchivo;
+            $destino = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/uploads';
+            $ruta = 'uploads/' . $nombreArchivo;
 
             // Crear carpeta si no existe
             if (!File::exists($destino)) {
