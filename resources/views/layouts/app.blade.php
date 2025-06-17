@@ -575,13 +575,9 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('prensa-eventos') ? 'active' : '' }}" href="{{ route('prensa-eventos') }}">Prensa y eventos</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('contacto') ? 'active' : '' }}" href="{{ route('contacto') }}">Contáctanos</a>
-                    </li>
-
                 </ul>
 
-                <a href="{{ route('contacto') }}" class="btn btn-primary ms-3">Solicita tu diseño gratuito</a>
+                <a href="{{ route('contacto') }}" class="btn btn-primary ms-3">Contactanos</a>
             </div>
         </div>
     </nav>

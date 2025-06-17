@@ -273,22 +273,21 @@ public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion
         'request_keys' => array_keys($request->all()),
     ]);
 
+    // 💥 Eliminar campos
     if ($request->has('eliminar_campos')) {
         foreach ($request->input('eliminar_campos') as $clave) {
             $contenido = $seccion->contenidos()->where('clave', $clave)->first();
 
             if ($contenido) {
                 if (Str::startsWith($clave, 'img_')) {
-                    $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/public_html/' . $contenido->valor;
+                    $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/' . $contenido->valor;
                     if (File::exists($rutaCompleta)) {
                         File::delete($rutaCompleta);
-                        Log::info("✅ Archivo eliminado: $rutaCompleta");
-                    } else {
-                        Log::warning("⚠️ Archivo no encontrado para eliminar: $rutaCompleta");
+                        Log::info("🗑️ Imagen eliminada: $rutaCompleta");
                     }
                 }
-
                 $contenido->delete();
+                Log::info("🧹 Contenido eliminado: $clave");
             }
         }
     }
@@ -297,50 +296,45 @@ public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion
         if (in_array($clave, ['_token', 'nuevo_contenido', 'eliminar_campos'])) continue;
 
         if ($request->hasFile($clave)) {
+            Log::info("🤖 Subiendo archivo para clave: $clave");
+
             $archivo = $request->file($clave);
             $nombreArchivo = uniqid() . '.' . $archivo->getClientOriginalExtension();
-            $ruta = 'uploads/' . $nombreArchivo;
 
-            $destino = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/public_html/uploads';
+            $destino = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/secciones';
+            $ruta = 'secciones/' . $nombreArchivo;
 
             // Crear carpeta si no existe
             if (!File::exists($destino)) {
-                try {
-                    File::makeDirectory($destino, 0755, true);
-                    Log::info("📁 Carpeta creada: $destino");
-                } catch (\Exception $e) {
-                    Log::error("❌ Error creando carpeta: " . $e->getMessage());
-                }
+                File::makeDirectory($destino, 0755, true);
+                Log::info("📁 Carpeta creada: $destino");
             }
 
-            // Mover imagen
-            try {
-                $archivo->move($destino, $nombreArchivo);
-                Log::info("✅ Imagen movida correctamente a $destino/$nombreArchivo");
-            } catch (\Exception $e) {
-                Log::error("❌ Error al mover imagen: " . $e->getMessage());
-            }
+            // Mover archivo
+            $archivo->move($destino, $nombreArchivo);
+            Log::info("✅ Imagen movida correctamente");
 
+            // Eliminar imagen anterior si existe
             $contenidoAnterior = $seccion->contenidos()->where('clave', $clave)->first();
             if ($contenidoAnterior) {
-                $rutaCompleta = $destino . '/' . basename($contenidoAnterior->valor);
+                $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/' . $contenidoAnterior->valor;
                 if (File::exists($rutaCompleta)) {
                     File::delete($rutaCompleta);
                     Log::info("🧹 Imagen anterior eliminada: $rutaCompleta");
-                } else {
-                    Log::warning("⚠️ Imagen anterior no encontrada: $rutaCompleta");
                 }
             }
 
             $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $ruta]);
-            Log::info("📌 Contenido actualizado/creado con imagen: $clave → $ruta");
+            Log::info("📂 Contenido actualizado/creado con imagen: $clave → $ruta");
         }
+
         elseif (!Str::startsWith($clave, 'img_')) {
             $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $valor]);
             Log::info("📄 Contenido texto actualizado/creado: $clave");
         }
     }
 
+    // Nuevo contenido por array
     if ($request->has('nuevo_contenido')) {
         foreach ($request->input('nuevo_contenido') as $item) {
             $clave = $item['clave'] ?? null;
@@ -348,12 +342,13 @@ public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion
 
             if ($clave && $valor !== null) {
                 $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $valor]);
-                Log::info("🆕 Nuevo contenido agregado: $clave");
+                Log::info("🆕 Contenido nuevo insertado: $clave");
             }
         }
     }
 
-    Log::info('✅ Sección actualizada correctamente');
+    Log::info("✅ Sección actualizada correctamente");
+
     return redirect()->route('paginas.secciones', $pagina)->with('success', 'Sección actualizada correctamente.');
 }
 
