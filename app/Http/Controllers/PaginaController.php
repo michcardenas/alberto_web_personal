@@ -273,19 +273,17 @@ public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion
         'request_keys' => array_keys($request->all()),
     ]);
 
-    // 💥 Eliminar campos
     if ($request->has('eliminar_campos')) {
         foreach ($request->input('eliminar_campos') as $clave) {
             $contenido = $seccion->contenidos()->where('clave', $clave)->first();
-
-            if ($contenido) {
-                if (Str::startsWith($clave, 'img_')) {
-                    $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/' . $contenido->valor;
-                    if (File::exists($rutaCompleta)) {
-                        File::delete($rutaCompleta);
-                        Log::info("🗑️ Imagen eliminada: $rutaCompleta");
-                    }
+            if ($contenido && Str::startsWith($clave, 'img_')) {
+                $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/public_html/' . $contenido->valor;
+                if (File::exists($rutaCompleta)) {
+                    File::delete($rutaCompleta);
+                    Log::info("🗑️ Imagen eliminada: $rutaCompleta");
                 }
+            }
+            if ($contenido) {
                 $contenido->delete();
                 Log::info("🧹 Contenido eliminado: $clave");
             }
@@ -301,31 +299,28 @@ public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion
             $archivo = $request->file($clave);
             $nombreArchivo = uniqid() . '.' . $archivo->getClientOriginalExtension();
 
-            $destino = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/uploads';
-            $ruta = 'uploads/' . $nombreArchivo;
+            $carpetaDestino = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/public_html/images';
+            $rutaRelativa = 'images/' . $nombreArchivo;
 
-            // Crear carpeta si no existe
-            if (!File::exists($destino)) {
-                File::makeDirectory($destino, 0755, true);
-                Log::info("📁 Carpeta creada: $destino");
+            if (!File::exists($carpetaDestino)) {
+                File::makeDirectory($carpetaDestino, 0755, true);
+                Log::info("📁 Carpeta creada: $carpetaDestino");
             }
 
-            // Mover archivo
-            $archivo->move($destino, $nombreArchivo);
+            $archivo->move($carpetaDestino, $nombreArchivo);
             Log::info("✅ Imagen movida correctamente");
 
-            // Eliminar imagen anterior si existe
             $contenidoAnterior = $seccion->contenidos()->where('clave', $clave)->first();
             if ($contenidoAnterior) {
-                $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/' . $contenidoAnterior->valor;
-                if (File::exists($rutaCompleta)) {
-                    File::delete($rutaCompleta);
-                    Log::info("🧹 Imagen anterior eliminada: $rutaCompleta");
+                $rutaCompletaAnterior = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/public_html/' . $contenidoAnterior->valor;
+                if (File::exists($rutaCompletaAnterior)) {
+                    File::delete($rutaCompletaAnterior);
+                    Log::info("🧹 Imagen anterior eliminada: $rutaCompletaAnterior");
                 }
             }
 
-            $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $ruta]);
-            Log::info("📂 Contenido actualizado/creado con imagen: $clave → $ruta");
+            $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $rutaRelativa]);
+            Log::info("📂 Contenido actualizado/creado con imagen: $clave → $rutaRelativa");
         }
 
         elseif (!Str::startsWith($clave, 'img_')) {
@@ -334,7 +329,6 @@ public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion
         }
     }
 
-    // Nuevo contenido por array
     if ($request->has('nuevo_contenido')) {
         foreach ($request->input('nuevo_contenido') as $item) {
             $clave = $item['clave'] ?? null;
