@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
-@section('title', $articulo->titulo)
+@section('title')
+    {{ $articulo->titulo }}
+@endsection
+
 
 @section('content')
 <style>
@@ -54,24 +57,26 @@
     }
 </style>
 
-<div class="article-header">
+<div class="article-header" data-aos="fade-down">
     <div class="container">
         <h1 class="article-title">{{ $articulo->titulo }}</h1>
         <p class="article-meta">Publicado el {{ $articulo->created_at->format('d M, Y') }}</p>
     </div>
 </div>
 
-<div class="container article-content">
+
+<div class="container article-content" data-aos="fade-up" data-aos-delay="100">
     @if ($articulo->imagen)
-        <img src="{{ asset($articulo->imagen) }}" alt="{{ $articulo->titulo }}">
+        <img src="{{ asset($articulo->imagen) }}" alt="{{ $articulo->titulo }}" data-aos="zoom-in" data-aos-delay="200">
     @endif
 
-    <div class="article-body">
+    <div class="article-body" data-aos="fade-up" data-aos-delay="300">
         {!! $articulo->contenido !!}
     </div>
 
-    <div class="text-start mt-4">
+    <div class="text-start mt-4" data-aos="fade-up" data-aos-delay="400">
         <a href="{{ route('blog') }}" class="btn btn-outline-secondary">&larr; Volver al Blog</a>
     </div>
 </div>
+
 @endsection

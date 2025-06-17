@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\GlobalSetting;
-
+use App\Models\Pagina;
+use App\Models\Seo;
 
 class PageController extends Controller
 {
@@ -110,27 +111,43 @@ public function showEnglish()
 
 public function sobreMi()
 {
-    return view('paginas.sobre-mi');
+    $pagina = Pagina::where('slug', 'sobre-mi')->firstOrFail();
+    $seo = Seo::where('pagina_id', $pagina->id)->first();
+    return view('paginas.sobre-mi', compact('seo'));
 }
 
 public function loQueHago()
 {
-    return view('paginas.lo-que-hago');
+    $pagina = Pagina::where('slug', 'lo-que-hago')->firstOrFail();
+    $seo = Seo::where('pagina_id', $pagina->id)->first();
+    return view('paginas.lo-que-hago', compact('seo'));
 }
 
 public function hostella()
 {
-    return view('paginas.hostella');
+    $pagina = Pagina::where('slug', 'hostella')->firstOrFail();
+    $seo = Seo::where('pagina_id', $pagina->id)->first();
+    return view('paginas.hostella', compact('seo'));
 }
 
 public function prensaEventos()
 {
-    return view('paginas.prensa-eventos');
+    $pagina = Pagina::where('slug', 'prensa-eventos')->with('secciones.contenidos')->firstOrFail();
+    $seo = Seo::where('pagina_id', $pagina->id)->first();
+
+    // Obtener contenidos de la sección "encabezado"
+    $seccionEncabezado = $pagina->secciones->firstWhere('slug', 'encabezado');
+    $contenidos = $seccionEncabezado?->contenidos->pluck('valor', 'clave') ?? collect();
+
+    return view('paginas.prensa-eventos', compact('pagina', 'seo', 'contenidos'));
 }
+
 
 public function contacto()
 {
-    return view('paginas.contacto');
+    $pagina = Pagina::where('slug', 'contacto')->firstOrFail();
+    $seo = Seo::where('pagina_id', $pagina->id)->first();
+    return view('paginas.contacto', compact('seo'));
 }
 
 }

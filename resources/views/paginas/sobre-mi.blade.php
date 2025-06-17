@@ -77,6 +77,7 @@ $timeline = optional(optional($secciones['timeline'] ?? null)->contenidos)
 
     .timeline-content p {
         color: var(--brand-gray);
+        margin-bottom: 0;
     }
 
     .typing-title {
@@ -98,19 +99,20 @@ $timeline = optional(optional($secciones['timeline'] ?? null)->contenidos)
     }
 
     @keyframes blink {
-
-        from,
-        to {
-            border-color: transparent
+        from, to {
+            border-color: transparent;
         }
-
         50% {
             border-color: var(--brand-primary);
         }
     }
 
-
-    @media (max-width: 768px) {
+    /* === RESPONSIVE STYLES === */
+    @media (max-width: 992px) {
+        .section-title {
+            font-size: 2rem;
+            text-align: center;
+        }
 
         .timeline-item,
         .timeline-item.left,
@@ -118,6 +120,61 @@ $timeline = optional(optional($secciones['timeline'] ?? null)->contenidos)
             left: 0 !important;
             width: 100%;
             text-align: left;
+            padding: 1rem 1.2rem;
+        }
+
+        .timeline-dot {
+            left: -10px;
+        }
+
+        .timeline-content {
+            padding: 1.25rem;
+        }
+
+        .timeline-year {
+            font-size: 1.1rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .img-fluid.rounded-circle {
+            max-width: 220px !important;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+        }
+
+        .timeline-content p,
+        ul.list-unstyled li {
+            font-size: 0.95rem;
+        }
+
+        .row.align-items-center.g-5 {
+            row-gap: 2rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .section-title {
+            font-size: 1.6rem;
+        }
+
+        .timeline-wrapper {
+            padding: 1rem 0;
+        }
+
+        .timeline-item {
+            padding: 0.75rem 1rem;
+        }
+
+        .timeline-content {
+            padding: 1rem;
+        }
+
+        .timeline-dot {
+            top: 10px;
         }
     }
 </style>
@@ -125,7 +182,8 @@ $timeline = optional(optional($secciones['timeline'] ?? null)->contenidos)
 {{-- Sección PERFIL --}}
 <section class="py-5" style="
     background: url('{{ asset('images/bg-textura.jpg') }}') center center / cover no-repeat fixed;
-    color: var(--brand-dark);">
+    color: var(--brand-dark);
+    overflow-x: hidden;">
     <div class="container">
         <div class="row align-items-center g-5">
 
@@ -161,26 +219,55 @@ $timeline = optional(optional($secciones['timeline'] ?? null)->contenidos)
 
 {{-- Sección TIMELINE --}}
 @if($timeline->isNotEmpty())
-<section class="py-5" style="background-color: var(--brand-light);">
+@php
+$eventos = $timeline
+    ->filter(fn($valor, $clave) => Str::startsWith($clave, 'evento_'))
+    ->mapWithKeys(fn($valor, $clave) => [
+        Str::after($clave, 'evento_') => ['texto' => $valor]
+    ]);
+
+$eventos = $eventos->map(function ($item, $anio) use ($timeline) {
+    $imagen = $timeline->get('img_' . $anio);
+    return array_merge($item, ['imagen' => $imagen]);
+});
+@endphp
+
+<section class="py-5" style="background-color: var(--brand-light); overflow-x: hidden;">
     <div class="container">
         <h2 class="section-title text-center mb-5" data-aos="fade-up">Nuestra historia</h2>
         <div class="timeline-wrapper">
             @foreach ($timeline as $clave => $evento)
-            @php
-            $anio = Str::after($clave, 'evento_');
-            $left = $loop->index % 2 === 0;
-            @endphp
-            <div class="timeline-item {{ $left ? 'left' : 'right' }}" data-aos="fade-up" data-aos-delay="{{ $loop->index * 150 }}">
-                <div class="timeline-content">
-                    <div class="timeline-dot"></div>
-                    <h4 class="timeline-year">{{ $anio }}</h4>
-                    <p>{{ $evento }}</p>
-                </div>
+    @continue(!Str::startsWith($clave, 'evento_'))
+
+    @php
+        // Extrae solo el año desde la clave tipo 'evento_2024_1'
+        preg_match('/evento_(\d{4})/', $clave, $match);
+        $anio = $match[1] ?? 'Año';
+
+        $left = $loop->index % 2 === 0;
+        $imagen = $timeline->get('img_' . Str::after($clave, 'evento_'));
+    @endphp
+
+    <div class="timeline-item {{ $left ? 'left' : 'right' }}" data-aos="fade-up" data-aos-delay="{{ $loop->index * 150 }}">
+        <div class="timeline-content">
+            <h4 class="timeline-year">{{ $anio }}</h4>
+            <p>{{ $evento }}</p>
+
+            @if ($imagen)
+            <div class="mt-3">
+                <img src="{{ asset($imagen) }}" alt="Imagen {{ $anio }}"
+                    class="img-fluid rounded shadow-sm"
+                    style="max-height: 250px; object-fit: cover; width: 100%;">
             </div>
-            @endforeach
+            @endif
+        </div>
+    </div>
+@endforeach
+
         </div>
     </div>
 </section>
 @endif
+
 
 @endsection

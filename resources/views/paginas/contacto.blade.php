@@ -4,9 +4,9 @@
 
 @section('content')
 @php
-    $pagina = \App\Models\Pagina::where('slug', 'contacto')->with('secciones.contenidos')->first();
-    $seccion = $pagina->secciones->firstWhere('slug', 'formulario');
-    $formulario = optional($seccion)->contenidos->pluck('valor', 'clave') ?? collect();
+$pagina = \App\Models\Pagina::where('slug', 'contacto')->with('secciones.contenidos')->first();
+$seccion = $pagina->secciones->firstWhere('slug', 'formulario');
+$formulario = optional($seccion)->contenidos->pluck('valor', 'clave') ?? collect();
 @endphp
 
 <style>
@@ -56,7 +56,7 @@
         overflow: hidden;
         height: 100%;
         min-height: 360px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease;
     }
 
@@ -65,15 +65,15 @@
     }
 </style>
 
-<section class="py-5" style="background-color: var(--brand-light);">
+<section class="py-5" style="background-color: var(--brand-light); min-height: 100vh; overflow-x: hidden;">
     <div class="container">
-        <div class="text-center mb-5">
+        <div class="text-center mb-5" data-aos="fade-up">
             <h1 class="section-title">{{ $formulario['h1_titulo'] ?? 'Contáctanos' }}</h1>
             <p class="lead">{{ $formulario['p_intro'] ?? '¿Tienes un proyecto en mente o deseas una asesoría? Estoy lista para ayudarte.' }}</p>
         </div>
 
         <div class="row g-5">
-            <div class="col-md-6">
+            <div class="col-md-6" data-aos="fade-right">
                 <form action="#" method="POST" class="contact-form">
                     @csrf
                     <div class="mb-3">
@@ -92,16 +92,19 @@
                 </form>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6" data-aos="fade-left">
                 <div class="map-container">
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3..."
-                        width="100%" height="100%" frameborder="0"
-                        style="border:0;" allowfullscreen="" loading="lazy">
+                        src="{{ $formulario['mapa_src'] ?? 'https://www.google.com/maps/embed?pb=...default' }}"
+                        width="100%" height="400" style="border:0;"
+                        allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
                     </iframe>
                 </div>
+
             </div>
         </div>
     </div>
 </section>
+
 @endsection

@@ -4,8 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alberto Ascencion</title>
     <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
+    {{-- Meta dinámico desde $seo --}}
+    <title>@yield('meta_title', $seo->meta_title ?? 'Alberto Ascencion')</title>
+    <meta name="description" content="{{ $seo->meta_description ?? 'Descripción por defecto del sitio.' }}">
+    <meta name="keywords" content="{{ $seo->meta_keywords ?? '' }}">
+
+    {{-- Canonical --}}
+    @if (!empty($seo->canonical))
+    <link rel="canonical" href="{{ $seo->canonical }}">
+    @endif
+
+    {{-- Open Graph --}}
+    <meta property="og:title" content="{{ $seo->og_title ?? $seo->meta_title ?? 'Alberto Ascencion' }}">
+    <meta property="og:description" content="{{ $seo->og_description ?? $seo->meta_description ?? '' }}">
+    @if (!empty($seo->og_image))
+    <meta property="og:image" content="{{ asset($seo->og_image) }}">
+    @endif
+    <meta property="og:type" content="{{ $seo->og_type ?? 'website' }}">
+    @if (!empty($seo->og_url))
+    <meta property="og:url" content="{{ $seo->og_url }}">
+    @endif
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -494,7 +513,6 @@
         }
 
 
-
         /* Ajustes responsivos */
         @media (max-width: 992px) {
             .language-buttons {
@@ -525,7 +543,7 @@
     </style>
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{{ route('home') }}">
@@ -563,12 +581,6 @@
 
                 </ul>
 
-                <!-- Botones de idioma -->
-                <div class="language-buttons ms-3 d-flex">
-                    <a href="{{ route('welcome') }}" class="lang-btn {{ request()->routeIs('welcome') ? 'active' : '' }}" title="Español">ES</a>
-                    <a href="{{ route('Alberto Ascencion') }}" class="lang-btn {{ request()->routeIs('Alberto Ascencion') ? 'active' : '' }}" title="English">EN</a>
-                </div>
-
                 <a href="{{ route('contacto') }}" class="btn btn-primary ms-3">Solicita tu diseño gratuito</a>
             </div>
         </div>
@@ -576,9 +588,10 @@
 
 
     <!-- Page Content -->
-    <main style="padding-top: 100px;">
+    <main class="flex-fill" style="padding-top: 100px;">
         @yield('content')
     </main>
+
     <footer style="background-color: var(--brand-dark); color: var(--brand-light); padding: 3rem 0;">
         <style>
             :root {
@@ -631,17 +644,6 @@
                 <div class="col-lg-4 mb-4 mb-lg-0">
                     <img src="{{ asset('images/logo.png') }}" alt="Alberto Ascencion" height="160">
                     <p class="mt-3">Transformando espacios de cocina en hogares con personalidad.</p>
-                </div>
-
-                <div class="col-lg-4 mb-4 mb-lg-0 text-lg-center">
-                    <h5 class="text-uppercase text-white">Enlaces rápidos</h5>
-                    <div class="footer-menu mt-3">
-                        <a href="#inicio">Inicio</a>
-                        <a href="#servicios">Servicios</a>
-                        <a href="#portafolio">Portafolio</a>
-                        <a href="#testimonios">Testimonios</a>
-                        <a href="#contacto">Contacto</a>
-                    </div>
                 </div>
 
                 <div class="col-lg-4 text-lg-end">
@@ -706,6 +708,8 @@
                 });
         }
     </script>
+
+@stack('scripts')
 </body>
 
 </html>

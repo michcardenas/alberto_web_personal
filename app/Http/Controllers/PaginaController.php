@@ -263,33 +263,63 @@ class PaginaController extends Controller
         return view('admin.paginas.edit-seccion', compact('pagina', 'seccion', 'contenidos'));
     }
 
-    public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion)
-    {
-        foreach ($request->all() as $clave => $valor) {
-            if ($clave === '_token') continue;
+   public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion)
+{
+    // 💥 Eliminar campos
+    if ($request->has('eliminar_campos')) {
+        foreach ($request->input('eliminar_campos') as $clave) {
+            $contenido = $seccion->contenidos()->where('clave', $clave)->first();
 
-            // Si se subió una nueva imagen
-            if ($request->hasFile($clave)) {
-                $archivo = $request->file($clave);
-                $nombreArchivo = uniqid() . '.' . $archivo->getClientOriginalExtension();
-                $ruta = 'uploads/' . $nombreArchivo;
-                $archivo->move(public_path('uploads'), $nombreArchivo);
-
-                // Buscar contenido anterior
-                $contenidoAnterior = $seccion->contenidos()->where('clave', $clave)->first();
-                if ($contenidoAnterior && File::exists(public_path($contenidoAnterior->valor))) {
-                    File::delete(public_path($contenidoAnterior->valor)); // borrar imagen anterior
+            if ($contenido) {
+                // Si es imagen, borra el archivo físico
+                if (Str::startsWith($clave, 'img_') && File::exists(public_path($contenido->valor))) {
+                    File::delete(public_path($contenido->valor));
                 }
 
-                $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $ruta]);
+                $contenido->delete();
+            }
+        }
+    }
+
+    // 🔽 El resto ya lo tienes bien
+    foreach ($request->all() as $clave => $valor) {
+        if ($clave === '_token' || $clave === 'nuevo_contenido' || $clave === 'eliminar_campos') continue;
+
+        // Imagen nueva
+        if ($request->hasFile($clave)) {
+            $archivo = $request->file($clave);
+            $nombreArchivo = uniqid() . '.' . $archivo->getClientOriginalExtension();
+            $ruta = 'uploads/' . $nombreArchivo;
+            $archivo->move(public_path('uploads'), $nombreArchivo);
+
+            // Borrar imagen anterior
+            $contenidoAnterior = $seccion->contenidos()->where('clave', $clave)->first();
+            if ($contenidoAnterior && File::exists(public_path($contenidoAnterior->valor))) {
+                File::delete(public_path($contenidoAnterior->valor));
             }
 
-            // Si es texto normal y no imagen
-            elseif (!Str::startsWith($clave, 'img_')) {
+            $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $ruta]);
+        }
+
+        // Texto normal
+        elseif (!Str::startsWith($clave, 'img_')) {
+            $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $valor]);
+        }
+    }
+
+    // Procesar los nuevos campos agregados dinámicamente
+    if ($request->has('nuevo_contenido')) {
+        foreach ($request->input('nuevo_contenido') as $item) {
+            $clave = $item['clave'] ?? null;
+            $valor = $item['valor'] ?? null;
+
+            if ($clave && $valor !== null) {
                 $seccion->contenidos()->updateOrCreate(['clave' => $clave], ['valor' => $valor]);
             }
         }
-
-        return redirect()->route('paginas.secciones', $pagina)->with('success', 'Sección actualizada correctamente.');
     }
+
+    return redirect()->route('paginas.secciones', $pagina)->with('success', 'Sección actualizada correctamente.');
+}
+
 }

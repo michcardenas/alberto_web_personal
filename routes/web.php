@@ -9,7 +9,10 @@ use App\Http\Controllers\BlogController;
 
 
 
-Route::get('/', [PageController::class, 'showEnglish'])->name('home');
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
+
 Route::get('/welcome', function () {
     return view('welcome');
 })->name('welcome');
@@ -61,6 +64,13 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
 Route::post('/blog/upload', [BlogController::class, 'upload'])->name('blog.upload');
 
 
+Route::prefix('admin/seo')->name('admin.seo.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\SeoController::class, 'index'])->name('index');
+    Route::get('/{pagina}/edit', [\App\Http\Controllers\Admin\SeoController::class, 'edit'])->name('edit');
+    Route::post('/{pagina}/update', [\App\Http\Controllers\Admin\SeoController::class, 'update'])->name('update');
+});
+
+
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/sobre-mi', [PageController::class, 'sobreMi'])->name('sobre-mi');
@@ -73,8 +83,10 @@ Route::get('/contacto', [PageController::class, 'contacto'])->name('contacto');
 Route::get('/admin/global', [GlobalController::class, 'index'])->name('global.index');
 Route::post('/admin/global/update', [GlobalController::class, 'update'])->name('global.update');
 
+Route::post('/admin/blog/encabezado/{seccion}', [BlogController::class, 'actualizarEncabezado'])
+    ->name('admin.blog.encabezado.update');
 
-Route::get('/Alberto Ascencion', [PageController::class, 'showEnglish'])->name('Alberto Ascencion');
+
 
 
 require __DIR__.'/auth.php';

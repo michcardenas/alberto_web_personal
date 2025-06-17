@@ -6,15 +6,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use App\Models\Articulo;
+use App\Models\Seccion;
 
 class BlogController extends Controller
 {
     // Vista pública del blog
-    public function index()
-    {
-        $articulos = Articulo::latest()->get();
-        return view('paginas.blog', compact('articulos')); // vista pública
-    }
+public function index()
+{
+    $articulos = Articulo::latest()->get();
+
+    $seccion = Seccion::where('pagina_id', 4)->where('slug', 'encabezado')->first();
+    $contenidos = $seccion?->contenidos()->pluck('valor', 'clave')->toArray() ?? [];
+
+    return view('paginas.blog', compact('articulos', 'contenidos'));
+}
+
 
     // Vista pública de un artículo individual
     public function show($slug)
@@ -27,8 +33,22 @@ class BlogController extends Controller
     public function adminIndex()
     {
         $articulos = Articulo::latest()->get();
-        return view('admin.blog.index', compact('articulos'));
+
+        $seccion = Seccion::where('pagina_id', 4)->where('slug', 'encabezado')->first();
+        $contenidos = $seccion?->contenidos()->pluck('valor', 'clave')->toArray() ?? [];
+
+        return view('admin.blog.index', compact('articulos', 'seccion', 'contenidos'));
     }
+
+    public function actualizarEncabezado(Request $request, Seccion $seccion)
+    {
+        $seccion->contenidos()->updateOrCreate(['clave' => 'titulo_blog'], ['valor' => $request->input('titulo_blog')]);
+        $seccion->contenidos()->updateOrCreate(['clave' => 'descripcion_blog'], ['valor' => $request->input('descripcion_blog')]);
+
+        return back()->with('success', 'Encabezado actualizado correctamente.');
+    }
+
+
 
     // Mostrar formulario para crear
     public function create()
@@ -48,7 +68,7 @@ class BlogController extends Controller
         // Slug automático si no se especifica
         $data['slug'] = $data['slug'] ?? \Str::slug($data['titulo']);
 
-          // 🔥 Limpia enlaces tipo <a> con nombres de imágenes
+        // 🔥 Limpia enlaces tipo <a> con nombres de imágenes
         $data['contenido'] = preg_replace('/<a[^>]*>[^<]+\.(jpg|jpeg|png|gif)<\/a>/i', '', $data['contenido']);
 
         if ($request->hasFile('imagen')) {
@@ -82,7 +102,7 @@ class BlogController extends Controller
         // Si no se provee slug, lo generamos del título
         $data['slug'] = $data['slug'] ?? \Str::slug($data['titulo']);
         // 🔥 Limpia enlaces tipo <a> con nombres de imágenes
-    $data['contenido'] = preg_replace('/<a[^>]*>[^<]+\.(jpg|jpeg|png|gif)<\/a>/i', '', $data['contenido']);
+        $data['contenido'] = preg_replace('/<a[^>]*>[^<]+\.(jpg|jpeg|png|gif)<\/a>/i', '', $data['contenido']);
 
         if ($request->hasFile('imagen')) {
             // Elimina la imagen anterior si existe

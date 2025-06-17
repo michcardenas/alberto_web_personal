@@ -6,6 +6,22 @@
 <div class="container py-5">
     <h1 class="mb-4 text-center">Artículos del Blog</h1>
 
+    @if($seccion)
+    <form method="POST" action="{{ route('admin.blog.encabezado.update', $seccion) }}" class="mb-5">
+        @csrf
+        <div class="mb-3">
+            <label class="form-label">Título del Blog</label>
+            <input type="text" name="titulo_blog" class="form-control" value="{{ $contenidos['titulo_blog'] ?? '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Descripción del Blog</label>
+            <textarea name="descripcion_blog" class="form-control" rows="2">{{ $contenidos['descripcion_blog'] ?? '' }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar encabezado</button>
+    </form>
+    @endif
+
+
     <div class="text-center mb-4">
         <a href="{{ route('blog.create') }}" class="btn btn-success">➕ Crear nuevo artículo</a>
     </div>
