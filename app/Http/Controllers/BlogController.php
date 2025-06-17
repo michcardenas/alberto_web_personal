@@ -11,15 +11,15 @@ use App\Models\Seccion;
 class BlogController extends Controller
 {
     // Vista pública del blog
-public function index()
-{
-    $articulos = Articulo::latest()->get();
+    public function index()
+    {
+        $articulos = Articulo::latest()->get();
 
-    $seccion = Seccion::where('pagina_id', 4)->where('slug', 'encabezado')->first();
-    $contenidos = $seccion?->contenidos()->pluck('valor', 'clave')->toArray() ?? [];
+        $seccion = Seccion::where('pagina_id', 4)->where('slug', 'encabezado')->first();
+        $contenidos = $seccion?->contenidos()->pluck('valor', 'clave')->toArray() ?? [];
 
-    return view('paginas.blog', compact('articulos', 'contenidos'));
-}
+        return view('paginas.blog', compact('articulos', 'contenidos'));
+    }
 
 
     // Vista pública de un artículo individual
@@ -66,7 +66,7 @@ public function index()
         ]);
 
         // Slug automático si no se especifica
-        $data['slug'] = $data['slug'] ?? \Str::slug($data['titulo']);
+        $data['slug'] = $data['slug'] ?? Str::slug($data['titulo']);
 
         // 🔥 Limpia enlaces tipo <a> con nombres de imágenes
         $data['contenido'] = preg_replace('/<a[^>]*>[^<]+\.(jpg|jpeg|png|gif)<\/a>/i', '', $data['contenido']);
@@ -99,20 +99,19 @@ public function index()
             'imagen' => 'nullable|image|max:2048',
         ]);
 
-        // Si no se provee slug, lo generamos del título
-        $data['slug'] = $data['slug'] ?? \Str::slug($data['titulo']);
-        // 🔥 Limpia enlaces tipo <a> con nombres de imágenes
+        $data['slug'] = $data['slug'] ?? Str::slug($data['titulo']);
         $data['contenido'] = preg_replace('/<a[^>]*>[^<]+\.(jpg|jpeg|png|gif)<\/a>/i', '', $data['contenido']);
 
         if ($request->hasFile('imagen')) {
-            // Elimina la imagen anterior si existe
-            if ($articulo->imagen && \File::exists(public_path($articulo->imagen))) {
-                \File::delete(public_path($articulo->imagen));
+            if ($articulo->imagen) {
+                $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/' . $articulo->imagen;
+                if (File::exists($rutaCompleta)) {
+                    File::delete($rutaCompleta);
+                }
             }
 
-            // Guarda nueva imagen en public/uploads/articulos/
             $nombreArchivo = uniqid() . '.' . $request->file('imagen')->getClientOriginalExtension();
-            $request->file('imagen')->move(public_path('uploads/articulos'), $nombreArchivo);
+            $request->file('imagen')->move('/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/uploads/articulos', $nombreArchivo);
             $data['imagen'] = 'uploads/articulos/' . $nombreArchivo;
         }
 
@@ -121,12 +120,13 @@ public function index()
         return redirect()->route('admin.blog.index')->with('success', 'Artículo actualizado correctamente.');
     }
 
+
     public function upload(Request $request)
     {
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $nombreArchivo = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/articulos'), $nombreArchivo);
+            $file->move('/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/uploads/articulos', $nombreArchivo);
 
             return response()->json([
                 'url' => asset('uploads/articulos/' . $nombreArchivo),
@@ -137,11 +137,14 @@ public function index()
     }
 
 
-    // Eliminar artículo
+
     public function destroy(Articulo $articulo)
     {
-        if ($articulo->imagen && \Storage::disk('public')->exists($articulo->imagen)) {
-            \Storage::disk('public')->delete($articulo->imagen);
+        if ($articulo->imagen) {
+            $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/' . $articulo->imagen;
+            if (File::exists($rutaCompleta)) {
+                File::delete($rutaCompleta);
+            }
         }
 
         $articulo->delete();

@@ -91,7 +91,7 @@
 <body>
     <header>
 <div class="container" data-aos="fade-up">
-    <img src="{{ asset('img/logo.png') }}" alt="Logo de Alberto Ascención" style="width: 120px; margin-bottom: 1rem;">
+    <img src="{{ asset('images/logo.png') }}" alt="Logo de Alberto Ascención" style="width: 120px; margin-bottom: 1rem;">
     
     <h1>Alberto Ascención</h1>
     <p>
