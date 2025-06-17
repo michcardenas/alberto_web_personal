@@ -264,6 +264,7 @@ class PaginaController extends Controller
         return view('admin.paginas.edit-seccion', compact('pagina', 'seccion', 'contenidos'));
     }
 
+
 public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion)
 {
     Log::info('🛠️ Iniciando updateSeccion', [
@@ -277,12 +278,8 @@ public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion
             $contenido = $seccion->contenidos()->where('clave', $clave)->first();
 
             if ($contenido) {
-                Log::info("🗑️ Eliminando contenido: $clave");
-
                 if (Str::startsWith($clave, 'img_')) {
-                    $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/' . $contenido->valor;
-                    Log::info("📂 Ruta física a borrar: $rutaCompleta");
-
+                    $rutaCompleta = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/public_html/' . $contenido->valor;
                     if (File::exists($rutaCompleta)) {
                         File::delete($rutaCompleta);
                         Log::info("✅ Archivo eliminado: $rutaCompleta");
@@ -303,18 +300,25 @@ public function updateSeccion(Request $request, Pagina $pagina, Seccion $seccion
             $archivo = $request->file($clave);
             $nombreArchivo = uniqid() . '.' . $archivo->getClientOriginalExtension();
             $ruta = 'uploads/' . $nombreArchivo;
-            $destino = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/alberto_web_personal/public_html/uploads';
 
-            Log::info("📤 Subiendo archivo para clave: $clave", [
-                'nombre_archivo' => $nombreArchivo,
-                'destino' => $destino,
-            ]);
+            $destino = '/home/u274930358/domains/navajowhite-locust-675711.hostingersite.com/public_html/uploads';
 
+            // Crear carpeta si no existe
+            if (!File::exists($destino)) {
+                try {
+                    File::makeDirectory($destino, 0755, true);
+                    Log::info("📁 Carpeta creada: $destino");
+                } catch (\Exception $e) {
+                    Log::error("❌ Error creando carpeta: " . $e->getMessage());
+                }
+            }
+
+            // Mover imagen
             try {
                 $archivo->move($destino, $nombreArchivo);
-                Log::info("✅ Imagen movida correctamente");
+                Log::info("✅ Imagen movida correctamente a $destino/$nombreArchivo");
             } catch (\Exception $e) {
-                Log::error("❌ Error al mover archivo: " . $e->getMessage());
+                Log::error("❌ Error al mover imagen: " . $e->getMessage());
             }
 
             $contenidoAnterior = $seccion->contenidos()->where('clave', $clave)->first();
