@@ -26,6 +26,7 @@
     <meta property="og:url" content="{{ $seo->og_url }}">
     @endif
 
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -654,6 +655,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://unpkg.com/trix@2.0.0/dist/trix.umd.min.js"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-S26GJYS9ZR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-S26GJYS9ZR');
+</script>
+
     <script>
         AOS.init({
             duration: 1000,
